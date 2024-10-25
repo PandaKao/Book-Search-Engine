@@ -27,17 +27,17 @@ interface SignupArgs {
     }
 }
 
-interface SearchBooksArgs {
-    searchTerm: string;
-}
+// interface SearchBooksArgs {
+//     searchTerm: string;
+// }
 
-interface SaveBookArgs {
-    bookId: string;
-}
+// interface SaveBookArgs {
+//     bookId: string;
+// }
 
-interface RemoveBookArgs {
-    bookId: string;
-}
+// interface RemoveBookArgs {
+//     bookId: string;
+// }
 
 interface Context {
     user?: User;
