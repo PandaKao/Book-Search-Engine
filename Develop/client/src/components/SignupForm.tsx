@@ -81,7 +81,7 @@ const SignupForm = ({ handleModalClose }: { handleModalClose: () => void }) => {
       setShowAlert(true);
     };
 
-    setUserFormData({ username: '', email: '', password: '', savedBooks: [] });
+    setUserFormData({ username: '', email: '', password: '' });
   };
 
   return (
