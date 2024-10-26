@@ -19,7 +19,7 @@ interface Book {
     link?: string;
 }
 
-interface SignupArgs {
+interface addUserArgs {
     input: {
         username: string;
         email: string;
@@ -27,17 +27,18 @@ interface SignupArgs {
     }
 }
 
-// interface SearchBooksArgs {
-//     searchTerm: string;
-// }
+interface SaveBookArgs {
+    bookId: string;
+    title: string;
+    authors: string[];
+    description: string;
+    image?: string;
+    link?: string;
+}
 
-// interface SaveBookArgs {
-//     bookId: string;
-// }
-
-// interface RemoveBookArgs {
-//     bookId: string;
-// }
+interface RemoveBookArgs {
+    bookId: string;
+}
 
 interface Context {
     user?: User;
@@ -50,15 +51,11 @@ const resolvers = {
                 return await User.findOne({ _id: context.user._id });
             }
             throw new AuthenticationError('Not Authenticated');
-        },
-
-        // searchBooks: async (_parent: unknown, { searchTerm }: SearchBooksArgs): Promise<string[]> => {
-
-        // },
+        }
     },
 
     Mutation: {
-        signup: async (_parent: unknown, { input }: SignupArgs): Promise<{ token: string; user: User }> => {
+        addUser: async (_parent: unknown, { input }: addUserArgs): Promise<{ token: string; user: User }> => {
             const user = await User.create({ ...input });
             const token = signToken(user.username, user.email, user._id);
 
@@ -79,6 +76,51 @@ const resolvers = {
 
             const token = signToken(user.username, user.email, user._id);
             return { token, user };
+        },
+
+        saveBook: async (_parent: unknown, { bookId, title, authors, description, image, link }: SaveBookArgs, context: Context): Promise<User> => {
+            if (!context.user) {
+                throw new AuthenticationError('Not Authenticated');
+            }
+
+            const newBook = {
+                bookId,
+                title,
+                authors,
+                description,
+                image,
+                link,
+            };
+
+            const updatedUser = await User.findOneAndUpdate(
+                { _id: context.user._id },
+                { $addToSet: { savedBooks: newBook } },
+                { new: true }
+            );
+
+            if (!updatedUser) {
+                throw new Error('User not found');
+            }
+
+            return updatedUser;
+        },
+
+        removeBook: async (_parent: unknown, { bookId }: RemoveBookArgs, context: Context): Promise<User> => {
+            if (!context.user) {
+                throw new AuthenticationError('Not Authenticated');
+            }
+
+            const updatedUser = await User.findOneAndUpdate(
+                { _id: context.user._id },
+                { $pull: { savedBooks: { bookId } } },
+                { new: true }
+            );
+
+            if (!updatedUser) {
+                throw new Error('User not found');
+            }
+
+            return updatedUser;
         }
     }
 }

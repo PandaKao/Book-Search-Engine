@@ -32,11 +32,10 @@ const typeDefs = gql `
 
     type Query {
         me: User
-        searchBooks(searchTerm: String!): [Book]
     }
 
     type Mutation {
-        signup(input: UserInput!): Auth
+        addUser(input: UserInput!): Auth
         login(email: String!, password: String!): Auth
 
         saveBook(bookId: String!): User

@@ -15,7 +15,7 @@ const SignupForm = ({ handleModalClose }: { handleModalClose: () => void }) => {
   const [validated] = useState(false);
   // set state for alert
   const [showAlert, setShowAlert] = useState(false);
-  const [signup, { error }] = useMutation(ADD_USER, {
+  const [addUser, { error }] = useMutation(ADD_USER, {
     onError: (error) => {
       console.error('Mutation error: ', error);
       setShowAlert(true);
@@ -48,11 +48,11 @@ const SignupForm = ({ handleModalClose }: { handleModalClose: () => void }) => {
     }
 
     try {
-      const { data } = await signup({
+      const { data } = await addUser({
         variables: { input: { ...userFormData } },
       });
 
-      const token = data?.signup?.token;
+      const token = data?.addUser?.token;
       if (token) {
         Auth.login(token);
         handleModalClose();
