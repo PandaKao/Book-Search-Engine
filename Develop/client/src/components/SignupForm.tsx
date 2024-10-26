@@ -1,25 +1,42 @@
 import { useState } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
-
-import { createUser } from '../utils/API';
+import { ADD_USER } from '../utils/mutations';
+import { useMutation } from '@apollo/client';
+// import { createUser } from '../utils/API';
 import Auth from '../utils/auth';
 import type { User } from '../models/User';
 
 // biome-ignore lint/correctness/noEmptyPattern: <explanation>
-const SignupForm = ({}: { handleModalClose: () => void }) => {
+const SignupForm = ({ handleModalClose }: { handleModalClose: () => void }) => {
   // set initial form state
   const [userFormData, setUserFormData] = useState<User>({ username: '', email: '', password: '', savedBooks: [] });
   // set state for form validation
   const [validated] = useState(false);
   // set state for alert
   const [showAlert, setShowAlert] = useState(false);
+  const [signup, { error }] = useMutation(ADD_USER, {
+    onError: (error) => {
+      console.error('Mutation error: ', error);
+      setShowAlert(true);
+    },
+  });
 
+  //update state based on form input changes
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
-    setUserFormData({ ...userFormData, [name]: value });
+    setUserFormData({
+      ...userFormData,
+      [name]: value,
+    });
   };
 
+  // const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+  //   const { name, value } = event.target;
+  //   setUserFormData({ ...userFormData, [name]: value });
+  // };
+
+  // submit form
   const handleFormSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -31,25 +48,40 @@ const SignupForm = ({}: { handleModalClose: () => void }) => {
     }
 
     try {
-      const response = await createUser(userFormData);
+      const { data } = await signup({
+        variables: { input: { ...userFormData } },
+      });
 
-      if (!response.ok) {
-        throw new Error('something went wrong!');
+      const token = data?.signup?.token;
+      if (token) {
+        Auth.login(token);
+        handleModalClose();
       }
 
-      const { token } = await response.json();
-      Auth.login(token);
+      //   const response = await createUser(userFormData);
+
+      //   if (!response.ok) {
+      //     throw new Error('something went wrong!');
+      //   }
+
+      //   const { token } = await response.json();
+      //   Auth.login(token);
+      // } catch (err) {
+      //   console.error(err);
+      //   setShowAlert(true);
+      // }
+
+      // setUserFormData({
+      //   username: '',
+      //   email: '',
+      //   password: '',
+      //   savedBooks: [],
     } catch (err) {
       console.error(err);
       setShowAlert(true);
-    }
+    };
 
-    setUserFormData({
-      username: '',
-      email: '',
-      password: '',
-      savedBooks: [],
-    });
+    setUserFormData({ username: '', email: '', password: '', savedBooks: [] });
   };
 
   return (
@@ -58,7 +90,7 @@ const SignupForm = ({}: { handleModalClose: () => void }) => {
       <Form noValidate validated={validated} onSubmit={handleFormSubmit}>
         {/* show alert if server response is bad */}
         <Alert dismissible onClose={() => setShowAlert(false)} show={showAlert} variant='danger'>
-          Something went wrong with your signup!
+          {error ? error.message : 'Something went wrong with your signup!'}
         </Alert>
 
         <Form.Group className='mb-3'>
