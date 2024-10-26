@@ -47,7 +47,7 @@ const resolvers = {
     Query: {
         me: async (_parent: unknown, _args: unknown, context: Context): Promise<User | null> => {
             if (context.user) {
-                return await User.findOne({ _id: context.user._id }).populate('savedBooks');
+                return await User.findOne({ _id: context.user._id });
             }
             throw new AuthenticationError('Not Authenticated');
         },
