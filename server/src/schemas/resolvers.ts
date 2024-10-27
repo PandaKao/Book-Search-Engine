@@ -62,7 +62,7 @@ const resolvers = {
             return { token, user };
         },
 
-        login: async (_parent: unknown, { email, password }: { email: string; password: string }): Promise<{ token: string; user: User }> => {
+        loginUser: async (_parent: unknown, { email, password }: { email: string; password: string }): Promise<{ token: string; user: User }> => {
             const user = await User.findOne({ email });
 
             if (!user) {

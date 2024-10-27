@@ -10,7 +10,7 @@ import Auth from '../utils/auth';
 // biome-ignore lint/correctness/noEmptyPattern: <explanation>
 const LoginForm = ({ handleModalClose }: { handleModalClose: () => void }) => {
   const [userFormData, setUserFormData] = useState({ email: '', password: '' });
-  const [login, { error }] = useMutation(LOGIN_USER);
+  const [loginUser, { error }] = useMutation(LOGIN_USER);
   const [validated] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
 
@@ -30,11 +30,11 @@ const LoginForm = ({ handleModalClose }: { handleModalClose: () => void }) => {
     }
 
     try {
-      const { data } = await login({
+      const { data } = await loginUser({
         variables: { ...userFormData },
       });
 
-      Auth.login(data.login.token);
+      Auth.login(data.loginUser.token);
       handleModalClose();
       //   const response = await loginUser(userFormData);
 
