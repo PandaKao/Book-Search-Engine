@@ -5,10 +5,27 @@ import {
   ApolloProvider,
   createHttpLink,
 } from '@apollo/client';
+import type { Book } from './models/Book';
 import { setContext } from '@apollo/client/link/context';
 import { Outlet } from 'react-router-dom';
 
 import Navbar from './components/Navbar';
+
+const cache = new InMemoryCache({
+  typePolicies: {
+    User: {
+      fields: {
+        savedBooks: {
+          merge(existing: Book[] = [], incoming: Book[]) {
+            const existingIds = existing.map(book => book.bookId);
+            const uniqueIncoming = incoming.filter(book => !existingIds.includes(book.bookId));
+            return [...existing, ...uniqueIncoming];
+          },
+        },
+      },
+    },
+  },
+});
 const httpLink = createHttpLink({
   uri: '/graphql',
 });
@@ -29,7 +46,7 @@ const authLink = setContext((_, { headers }) => {
 const client = new ApolloClient({
   // Set up our client to execute the `authLink` middleware prior to making the request to our GraphQL API
   link: authLink.concat(httpLink),
-  cache: new InMemoryCache(),
+  cache,
 });
 
 function App() {
