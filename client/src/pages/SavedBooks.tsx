@@ -65,7 +65,7 @@ const SavedBooks = () => {
       // const response = await deleteBook(bookId, token);
 
       // if (!response.ok) {
-        if(!data) {
+      if (!data) {
         throw new Error('something went wrong!');
       }
 
@@ -109,11 +109,14 @@ const SavedBooks = () => {
               <Col md='4' key={book.bookId}>
                 <Card border='dark'>
                   {book.image ? (
-                    <Card.Img
-                      src={book.image}
-                      alt={`The cover for ${book.title}`}
-                      variant='top'
-                    />
+                    <a href={book.link} target="_blank" rel="noopener noreferrer">
+                      <Card.Img
+                        src={book.image}
+                        alt={`The cover for ${book.title}`}
+                        variant='top'
+                      />
+                    </a>
+
                   ) : null}
                   <Card.Body>
                     <Card.Title>{book.title}</Card.Title>
