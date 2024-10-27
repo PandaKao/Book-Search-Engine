@@ -28,12 +28,14 @@ interface addUserArgs {
 }
 
 interface SaveBookArgs {
-    bookId: string;
-    title: string;
-    authors: string[];
-    description: string;
-    image?: string;
-    link?: string;
+    input: {
+        bookId: string;
+        title: string;
+        authors: string[];
+        description: string;
+        image?: string;
+        link?: string;
+    }
 }
 
 interface RemoveBookArgs {
@@ -78,23 +80,14 @@ const resolvers = {
             return { token, user };
         },
 
-        saveBook: async (_parent: unknown, { bookId, title, authors, description, image, link }: SaveBookArgs, context: Context): Promise<User> => {
+        saveBook: async (_parent: unknown, { input }: { input: SaveBookArgs }, context: Context): Promise<User> => {
             if (!context.user) {
                 throw new AuthenticationError('Not Authenticated');
             }
 
-            const newBook = {
-                bookId,
-                title,
-                authors,
-                description,
-                image,
-                link,
-            };
-
             const updatedUser = await User.findOneAndUpdate(
                 { _id: context.user._id },
-                { $addToSet: { savedBooks: newBook } },
+                { $addToSet: { savedBooks: input } },
                 { new: true }
             );
 
