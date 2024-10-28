@@ -51,14 +51,14 @@ const SearchBooks = () => {
       }
 
       const { items } = await response.json();
-      console.log('Book Array: ', items);
+      // console.log('Book Array: ', items);
 
       const bookData = items.map((book: GoogleAPIBook) => ({
         bookId: book.id,
         authors: book.volumeInfo.authors || ['No author to display'],
         title: book.volumeInfo.title,
         description: book.volumeInfo.description,
-        image: book.volumeInfo.imageLinks?.thumbnail || '',
+        image: book.volumeInfo.imageLinks?.thumbnail.replace('http://', 'https://') || '',
         link: book.volumeInfo?.infoLink || '',
       }));
 
