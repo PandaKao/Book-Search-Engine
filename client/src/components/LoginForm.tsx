@@ -1,6 +1,7 @@
 // see SignupForm.js for comments
 import { useState } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
+import type { Book } from '../models/Book';
 import { useMutation } from '@apollo/client';
 import { Form, Button, Alert } from 'react-bootstrap';
 import { LOGIN_USER } from '../utils/mutations';
@@ -36,6 +37,12 @@ const LoginForm = ({ handleModalClose }: { handleModalClose: () => void }) => {
 
       Auth.login(data.loginUser.token);
       handleModalClose();
+
+      // Store user's savedBooks in local storage
+      const bookIds = data.loginUser.user.savedBooks.map((book: Book) => book.bookId);
+      if(data.loginUser.user.savedBooks) {
+        localStorage.setItem('saved_books', JSON.stringify(bookIds));
+      }
       //   const response = await loginUser(userFormData);
 
       //   if (!response.ok) {
